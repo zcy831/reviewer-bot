@@ -1,18 +1,47 @@
 from fastapi import FastAPI, File, UploadFile
-from typing import Union
 import uvicorn
+
+from common.file_utils import convert_project_to_string
+from common.gpt_utils import generate_code_analyze_response
 
 app = FastAPI()
 
 
+DEFAULT_PROBLEM_DESCRIPTION = """
+Create a multi-channel forum api. Can use any stack, but must use typescript, be deployable, and of production quality. Try using graphql or grpc for fun, but REST is ok too. Try using docker containers for fun if you want. Show how you would like to write documentation and testing if possible.
+
+Channel Model: { id, name }
+
+Message Model: { id, title, content, channel, createdAt }
+
+The API should have these features.
+
+create a channel
+write messages in a channel
+list messages in a channel and order by descending (pagination is a extra credit)
+Show how a production level project would look. (documentation, testing, error handling, etc ...)
+
+Send the repository link of the project by email when finished.
+    """
+
+
 @app.get("/")
 def read_root():
-    return {"Hello": "World"}
+    return {"Hello": "Reviewer Bot"}
 
 
-@app.get("/items/{item_id}")
-def read_item(item_id: int, q: Union[str, None] = None):
-    return {"item_id": item_id, "q": q}
+@app.post("/analyze-project/")
+async def analyze_project(code_zip: UploadFile, problem_description: str = DEFAULT_PROBLEM_DESCRIPTION):
+    file_path = 'upload_file.zip'
+    try:
+        with open(file_path, 'wb') as f:
+            contents = await code_zip.read()
+            f.write(contents)
+    except Exception as e:
+        print(f"保存文件时出错: {e}")
+    code_content = convert_project_to_string(file_path)
+    response_json = generate_code_analyze_response(problem_description=problem_description, code_content=code_content)
+    return response_json
 
 
 if __name__ == "__main__":
