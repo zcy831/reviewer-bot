@@ -11,8 +11,8 @@
 ### 上传代码项目
 - **接口地址**：`POST /analyze-project`
 - **请求参数**：
-  - `problem_description`
-  - `code_zip`：要上传的代码项目压缩文件（如 `.zip` 格式）
+  - `problem_description`: 一段描述项目应实现功能的自然语言文字。
+  - `code_zip`：一个包含项目完整源代码的zip压缩文件。
 - **响应示例**：
   ```json
     {
