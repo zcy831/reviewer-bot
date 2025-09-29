@@ -31,8 +31,13 @@ def convert_project_to_string(project_path: str) -> str:
             file_path = "/".join(file_path_list[1:])
             print(file_path)
             file_content = ""
-            with open(full_file_path, "r") as file:
-                file_content = file.read()
+            try:
+                with open(full_file_path, "r") as file:
+                    file_content = file.read()
+            except FileNotFoundError:
+                print(f"Error: The file '{file_path}' was not found.")
+            except Exception as e:
+                print(f"An error occurred: {e}")
             file_content_list.append({
                 "file_path": file_path,
                 "file_content": file_content,
@@ -41,6 +46,7 @@ def convert_project_to_string(project_path: str) -> str:
         shutil.rmtree(extraction_path)
     if os.path.exists(project_path):
         os.remove(project_path)
+    # print(file_content_list)
     return json.dumps(file_content_list)
 
 

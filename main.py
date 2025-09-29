@@ -1,4 +1,4 @@
-from fastapi import FastAPI, File, UploadFile
+from fastapi import FastAPI, HTTPException, File, UploadFile
 import uvicorn
 
 from common.file_utils import convert_project_to_string
@@ -23,6 +23,7 @@ Show how a production level project would look. (documentation, testing, error h
 
 Send the repository link of the project by email when finished.
     """
+MAX_CODE_CONTENT_LENGTH = 1000000
 
 
 @app.get("/")
@@ -40,6 +41,12 @@ async def analyze_project(code_zip: UploadFile, problem_description: str = DEFAU
     except Exception as e:
         print(f"保存文件时出错: {e}")
     code_content = convert_project_to_string(file_path)
+    # with open("tmp.txt", "w") as f:
+    #     f.write(code_content)
+    #     print("write {} character to tmp.text".format(len(code_content)))
+    if len(code_content) > MAX_CODE_CONTENT_LENGTH:
+        message = "项目太大暂时无法分析, 代码长度: {}".format(len(code_content))
+        raise HTTPException(status_code=400, detail=message)
     response_json = generate_code_analyze_response(problem_description=problem_description, code_content=code_content)
     return response_json
 

@@ -12,7 +12,7 @@ def generate_code_analyze_response(
     ]
     message_to_add = build_code_analyze_prompt(problem_description=problem_description, code_content=code_content)
     messages.append({"role": "user", "content": message_to_add})
-    print(messages)
+    # print(messages)
     response = generate_gpt_response(messages=messages)
     content = response.choices[0].message.content
     print("got feedback gpt response: {}".format(content))
